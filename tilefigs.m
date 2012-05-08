@@ -76,7 +76,7 @@ N = nRow*nCol;          % total number of tiles
 
 
 % define window margins 
-if ispc             % (Tested on R2007b on WinXP)
+if ispc             % (Tested on R2007b on WinXP and R2011b on Win7)
     xMar = 4;           % nRow border margin [pixels]
     yMar = 4;           % nCol border margin [pixels]
     xOffset = 0;        % push figures right [pixels]
