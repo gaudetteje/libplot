@@ -9,7 +9,10 @@ function tilefigs(varargin)
 % TILEFIGS(FH,COLS,ROWS) places the figures with handles FH into a grid of
 % COLS columns by ROWS rows.
 %
-% TILEFIGS(FH,COLS,ROWS,true) uses all space available on multiple monitors
+% Extra options:
+%   'dual'  Uses all space available on multiple monitors
+% 	'keep'  Retains current figure width and height
+% Usage:  TILEFIGS(FH,COLS,ROWS,OPT1,OPT2,...)
 %
 % Note:  MATLAB is inconsistent in how it handles multiple monitors.  Be
 % aware that screen position (a la ScreenSize and MonitorPositions) may not
@@ -34,10 +37,16 @@ function tilefigs(varargin)
 
 % 
 
-% default to single monitor
-DUALDISPLAY = false;
 
-switch nargin
+DUALDISPLAY = false;    % default to single monitor
+KEEPRATIO = false;      % default to resize figure windows
+
+% separate optional arguments
+flags = cellfun(@ischar,varargin);
+opts = varargin(flags);
+args = varargin(~flags);
+
+switch numel(args)
     case 0
         FH = flipud(findobj('Type','figure')).';
     case 1
@@ -50,13 +59,23 @@ switch nargin
         FH = varargin{1};
         nCol = varargin{2};
         nRow = varargin{3};
-    case 4
-        FH = varargin{1};
-        nCol = varargin{2};
-        nRow = varargin{3};
-        DUALDISPLAY = varargin{4};
+    otherwise
+        error('Incorrect number of non-char arguments entered')
 end
 
+% handle extra parameters
+for k = 1:numel(opts)
+    switch(opts{k})
+        case 'keep'
+            KEEPRATIO = true;
+        case 'dual'
+            DUALDISPLAY = true;
+        otherwise
+            error('Unknown flag "%s"',f)
+    end
+end
+
+% set total number of figures to iterate over
 nFigs = length(FH);
 
 % auto calculate row/column geometry
@@ -164,6 +183,16 @@ for f = FH
     else
         tMar = titleMar + menuMar + toolMar;
         warning('tilefigs:propVals','Unknown figure property values')
+    end
+    
+    % override figure width/length with current setting
+    if KEEPRATIO
+        pos = get(gcf,'Position')
+        xDim = pos(3);
+        yDim = pos(4);
+        xMar = 0;
+        yMar = 0;
+        tMar = 0;
     end
     
     % set approximate figure positions and dimensions
