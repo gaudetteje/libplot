@@ -187,7 +187,7 @@ for f = FH
     
     % override figure width/length with current setting
     if KEEPRATIO
-        pos = get(gcf,'Position')
+        pos = get(gcf,'Position');
         xDim = pos(3);
         yDim = pos(4);
         xMar = 0;
