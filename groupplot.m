@@ -9,6 +9,13 @@ function groupplot(wdir, pattern, varargin)
 %
 % GROUPPLOT(DIR, PATTERN, true, 'log') will use a logarithmic x-axis rather than
 % linear.
+%
+% Example:
+%   Plot all files below the current directory with the exact name
+%   "TransferFn_CH001.mat" on a logarithmic scale
+%     >> groupplot('.', '^TransferFn\_CH001\.mat$', true, 'log')
+%   Plot all files in subdirectory "20090706" with a name starting "FFT 0p1 " and ending "CH002.mat"
+%     >> groupplot('20090706', '^FFT 0p1 .*CH002\.mat')
 
 
 
@@ -93,6 +100,18 @@ for fnum=1:nfiles
         set(cline, 'Color', clr);
     end
     
+    % setup legend
+    dirs = findstr(filesep,fname);
+    if length(dirs) > 1
+        parentdir = fname(dirs(end-1)+1:dirs(end));
+    else
+        parentdir = '';
+    end
+    keys(end+1) = {[parentdir fname(dirs(end)+1:end)]};
+    legend(char(keys));
+    set(legend, 'Interpreter', 'none');
+    legend hide
+    
     % setup axes
     faxis = axis;
     faxis(1) = fnorm * fmin;
@@ -119,4 +138,11 @@ for fnum=1:nfiles
         
         pause(1)
     end
+end
+
+if HOLDING
+    grid on;
+    xlabel('Frequency');
+    ylabel('dB');
+    title(strrep(pattern, '\', ''), 'Interpreter', 'none');
 end
