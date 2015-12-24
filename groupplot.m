@@ -3,12 +3,15 @@ function groupplot(wdir, pattern, varargin)
 % matching the input parameter
 %
 % GROUPPLOT(DIR, PATTERN) will plot all files matching the PATTERN
-% regular expression under the base directory, DIR.
+%     regular expression under the base directory, DIR.
+%
+% GROUPPLOT(DIR, PATTERN, CHANNEL) plots only the channel(s) found in the
+%     array of integers, CHANNEL.
 %
 % GROUPPLOT(DIR, PATTERN, false) will plot each file separately
 %
 % GROUPPLOT(DIR, PATTERN, true, 'log') will use a logarithmic x-axis rather than
-% linear.
+%     linear.
 %
 % Example:
 %   Plot all files below the current directory with the exact name
@@ -16,6 +19,8 @@ function groupplot(wdir, pattern, varargin)
 %     >> groupplot('.', '^TransferFn\_CH001\.mat$', true, 'log')
 %   Plot all files in subdirectory "20090706" with a name starting "FFT 0p1 " and ending "CH002.mat"
 %     >> groupplot('20090706', '^FFT 0p1 .*CH002\.mat')
+%
+% See also  TILEFIGS, SHOWFIGS
 
 
 
@@ -28,10 +33,11 @@ function groupplot(wdir, pattern, varargin)
 XAXIS = 'lin';
 SAVEFIG = false;
 HOLDING = true;
+CHANNEL = 1;
 
-% normalization factor
-fnorm = 1/1000;
-dnorm = 0;
+% normalization factor (optional)
+xnorm = 1e3;
+ynorm = 1;
 
 % parse user input
 if nargin > 4
@@ -42,7 +48,11 @@ elseif nargin > 3
     XAXIS = varargin{2};
     HOLDING = varargin{1};
 elseif nargin > 2
-    HOLDING = varargin{1};
+    if islogical(varargin{1})
+        HOLDING = varargin{1};
+    else
+        CHANNEL = varargin{1};
+    end
 end
 
 % set up figure window
@@ -55,12 +65,12 @@ nfiles=length(flist);
 if ~nfiles
     error('No files found in directory "%s"', wdir);
 end
-disp(sprintf('Found %d files...', nfiles));
+fprintf('Found %d files...\n', nfiles);
 
 % initialize vars
 nplot = 0;
-fmin = 0;
-fmax = 0;
+%xmin = 0;
+%xmax = 0;
 keys = {};
 
 % iterate over each file found
@@ -69,26 +79,40 @@ for fnum=1:nfiles
     % load MAT file
     fname = char(flist(fnum));
     load(fname);
-    if ~exist('fd', 'var')
-        disp(sprintf('[%d] No frequency data struct found!  Bypassing "%s"', nplot+1, fname));
+    if ~exist('fd','var') && ~exist('ts','var')
+        fprintf('[%d] No frequency or time series data structs found!  Bypassing "%s"\n', nplot+1, fname);
         continue;
     end
     
-    % extract data for plotting window
-    ind = find(fd.avgDB < -500,1);      % remove any invalid data points
-    if isempty(ind)
-        ind = length(fd.avgDB);
+    % get x-axis data
+    if exist('fd','var')
+        xx = fd.freq;
+        xUnits = 'Frequency (Hz)';
+    elseif exist('ts','var')
+        if isfield(ts,'time')
+            xx = ts.time;
+        else
+            xx = (0:size(ts.data,1)-1)./ts.fs;
+        end
+        xUnits = 'Time (seconds)';
     end
-    fmin = min(fmin, fd.freq(1));
-    fmax = max(fmax, fd.freq(ind));
+    
+    % get y-axis data
+    if exist('fd','var')
+        yy = fd.avgDB(:,CHANNEL);
+        yUnits = 'dB';
+    elseif exist('ts','var')
+        yy = ts.data(:,CHANNEL);
+        yUnits = 'Amplitude (Volts)';
+    end
     
     % plot results to graph
-    disp(sprintf('[%d] Plotting %s', fnum, fname));
+    fprintf('[%d] Plotting %s\n', fnum, fname);
     switch XAXIS
         case 'lin'
-            cline = plot(fnorm * fd.freq(1:ind-1), dnorm + fd.avgDB(1:ind-1));
+            cline = plot(xnorm * xx, ynorm * yy);
         case 'log'
-            cline = semilogx(fnorm * fd.freq(1:ind-1), dnorm + fd.avgDB(1:ind-1));
+            cline = semilogx(xnorm * xx, ynorm * yy);
         otherwise
             error('Incorrect mode for xaxis plot')
     end
@@ -112,28 +136,26 @@ for fnum=1:nfiles
     set(legend, 'Interpreter', 'none');
     legend hide
     
-    % setup axes
-    faxis = axis;
-    faxis(1) = fnorm * fmin;
-    faxis(2) = fnorm * fmax;
-    axis(faxis);
+    % force axes to overall data extent
+    %xAxis = axis;
+    %xAxis(1) = xnorm * xmin;
+    %xAxis(2) = xnorm * xmax;
+    %axis(xAxis);
     
     % update count
     nplot = nplot + 1;
     
-    %pause(2);
     if ~HOLDING
-
         grid on;
-        xlabel('Frequency');
-        ylabel('dB');
+        xlabel(xUnits);
+        ylabel(yUnits);
         title(strrep(fname(3:end),'_',' '));
 
         % save figure to working directory
         if SAVEFIG
             figname = [fname(1:end-4) '.fig'];
             saveas(gcf, figname, 'fig');
-            disp(sprintf('Saving figure to %s', figname));
+            fprintf('Saving figure to %s\n', figname);
         end
         
         pause(1)
@@ -142,7 +164,7 @@ end
 
 if HOLDING
     grid on;
-    xlabel('Frequency');
-    ylabel('dB');
+    xlabel(xUnits);
+    ylabel(yUnits);
     title(strrep(pattern, '\', ''), 'Interpreter', 'none');
 end
