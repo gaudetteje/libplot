@@ -31,11 +31,11 @@ function tilefigs(varargin)
 % - Fix multiple monitors (test with newer MATLAB versions)
 % - Fix bug for multiple monitors of different sizes
 
-
-
-
-
-% 
+% Author:   Jason Gaudette
+% Company:  Naval Undersea Warfare Center (Newport, RI)
+% Phone:    401.832.6601
+% Email:    jason.e.gaudette@navy.mil
+% Date:     20100914
 
 
 DUALDISPLAY = false;    % default to single monitor

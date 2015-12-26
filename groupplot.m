@@ -22,11 +22,11 @@ function groupplot(wdir, pattern, varargin)
 %
 % See also  TILEFIGS, SHOWFIGS
 
-
-
-
-
-% 
+% Author:   Jason Gaudette
+% Company:  Naval Undersea Warfare Center (Newport, RI)
+% Phone:    401.832.6601
+% Email:    gaudetteje@npt.nuwc.navy.mil
+% Date:     20151224
 %
 
 % define default behaviour
@@ -99,7 +99,17 @@ for fnum=1:nfiles
     
     % get y-axis data
     if exist('fd','var')
-        yy = fd.avgDB(:,CHANNEL);
+        fnames = fieldnames(fd);
+        for n = 1:numel(fnames)
+            if any(strcmpi(fnames{n}, {'avgdb','magdb'}))
+                field = fnames{n};
+                continue
+            end
+        end
+        if ~exist('field','var') || isempty(field)
+            error('Could not identify y-axis data field!');
+        end
+        yy = fd.(field)(:,CHANNEL);
         yUnits = 'dB';
     elseif exist('ts','var')
         yy = ts.data(:,CHANNEL);

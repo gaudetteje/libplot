@@ -4,11 +4,11 @@ function tsplot(varargin)
 % 
 % ts.time is assumed to contain the time sequence
 
-
-
-
-
-% 
+% Author:   Jason Gaudette
+% Company:  Naval Undersea Warfare Center (Newport, RI)
+% Phone:    401.832.6601
+% Email:    jason.e.gaudette@navy.mil
+% Date:     20090820
 %
 
 tic;    % start timer

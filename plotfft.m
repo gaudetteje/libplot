@@ -1,11 +1,11 @@
 function plotfft(varargin)
 % PLOTFFT  Plots results from GROUPFFT
 
-
-
-
-
-% 
+% Author:   Jason Gaudette
+% Company:  Naval Undersea Warfare Center (Newport, RI)
+% Phone:    401.832.6601
+% Email:    gaudetteje@npt.nuwc.navy.mil
+% Date:     20060928
 %
 
 winname = 'rectwin'

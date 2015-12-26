@@ -6,11 +6,11 @@ function groupplot(wdir, varargin)
 %
 % SINGLEPLOT(DIR, 'log') will plot data on a logarithmic axis
 
-
-
-
-
-% 
+% Author:   Jason Gaudette
+% Company:  Naval Undersea Warfare Center (Newport, RI)
+% Phone:    401.832.6601
+% Email:    gaudetteje@npt.nuwc.navy.mil
+% Date:     20070628
 %
 
 % define default behaviour
