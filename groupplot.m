@@ -22,13 +22,6 @@ function groupplot(wdir, pattern, varargin)
 %
 % See also  TILEFIGS, SHOWFIGS
 
-% Author:   Jason Gaudette
-% Company:  Naval Undersea Warfare Center (Newport, RI)
-% Phone:    401.832.6601
-% Email:    gaudetteje@npt.nuwc.navy.mil
-% Date:     20151224
-%
-
 % define default behaviour
 XAXIS = 'lin';
 SAVEFIG = false;

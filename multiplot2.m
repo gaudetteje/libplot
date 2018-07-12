@@ -9,13 +9,6 @@ function multiplot(varargin)
 % MULTIPLOT(DBnorm,Fnorm,'log')  plots a logarithmic x axis useful for some
 % data sets.
 
-% Author:   Jason Gaudette
-% Company:  Naval Undersea Warfare Center (Newport, RI)
-% Phone:    401.832.6601
-% Email:    gaudetteje@npt.nuwc.navy.mil
-% Date:     20061208
-%
-
 % define default behaviour
 xaxis = 'lin';
 
